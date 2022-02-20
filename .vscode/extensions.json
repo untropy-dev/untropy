@@ -1,0 +1,10 @@
+{
+  // https://go.microsoft.com/fwlink/?LinkId=827846 learn more about workspace recommendations
+  "recommendations": [
+    "samuelcolvin.jinjahtml",
+    "ms-python.python",
+    "redhat.vscode-yaml",
+    "EditorConfig.EditorConfig",
+    "bungcip.better-toml"
+  ]
+}

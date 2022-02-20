@@ -1,0 +1,32 @@
+name: Lint and test branch
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+jobs:
+  lint-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - uses: pre-commit/action@v2.0.3
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flit wheel
+      - name: Install environment and test
+        run: |
+          set -o pipefail
+          flit install --symlink --deps all
+          pytest | tee pytest-coverage.txt
+          flit build
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest-junit.xml

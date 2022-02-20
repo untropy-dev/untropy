@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "detail": "build wheel artifact",
+      "command": "pip",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "args": ["wheel", "-w", "wheels", "--no-deps", "${workspaceFolderBasename}"],
+      "presentation": {
+        "echo": true,
+        "panel": "shared",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test_dependencies",
+      "detail": "before running pytest test, you'll have to install all mandatory dependencies",
+      "command": "pip",
+      "type": "shell",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "args": ["install", "-q", "-r", "test-requirements.txt"]
+    },
+    {
+      "label": "tests",
+      "command": "${config:python.pythonPath}",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": ["test_dependencies"],
+      "args": ["-m", "pytest", "tests", "--exitfirst", "-o faulthandler_timeout=60", "-o xfail_strict=true"],
+      "problemMatcher": [
+        {
+          "fileLocation": ["relative", "${workspaceRoot}"],
+          "pattern": [
+            {
+              "regexp": "^\\s+File \"(.*)\", line (\\d+), in (.*)$",
+              "file": 1,
+              "line": 2
+            },
+            {
+              "regexp": "^\\s+(.*)$",
+              "message": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

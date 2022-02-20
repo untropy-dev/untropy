@@ -1,0 +1,32 @@
+{
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "editor.rulers": [80, 120],
+  "files.exclude": {
+    "**/dist": true,
+    "**/env": true
+  },
+  "prettier.printWidth": 120,
+  "python.formatting.blackArgs": ["--line-length", "120"],
+  "python.formatting.provider": "black",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--ignore", "E203,W503", "--max-line-length", "120"],
+  "python.linting.mypyEnabled": true,
+  "python.linting.pylintEnabled": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "editor.formatOnSave": true,
+  "editor.renderWhitespace": "boundary",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests/", "--exitfirst", "-o faulthandler_timeout=60", "-o xfail_strict=true"],
+  "rest-client.previewOption": "exchange",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active"
+}
