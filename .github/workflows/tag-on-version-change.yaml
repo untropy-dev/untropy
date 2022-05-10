@@ -1,0 +1,19 @@
+on:
+  push:
+    branches: ["main"]
+
+name: Create Git Tag
+jobs:
+  versioner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Version tag
+        uses: untropy-dev/action-autotag-python@fix_issues
+
+        with:
+          path: src/untropy/__init__.py
+          variable: __version__
+          github_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          prefix: v

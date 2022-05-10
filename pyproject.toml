@@ -1,0 +1,176 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "untropy"
+authors = [{ name = "Antoine Martin", email = "antoine@mrtn.fr" }]
+dynamic = ["version", "description"]
+readme = "README.md"
+license = { file = "LICENSE" }
+urls = { Home = "https://github.com/untropy/untropy" }
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Security",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: Software Development :: Version Control",
+  "Typing :: Typed",
+  "Topic :: Utilities",
+]
+keywords = ["untropy", "devops"]
+requires-python = ">=3.8"
+dependencies = [
+  "click==8.0.4",
+  "python-dotenv==0.19.2",
+  "toml>=0.10.1,<0.11",
+  "pydantic==1.9.0",
+  "coloredlogs==15.0.1",
+  "timeago==1.0.14",
+  "selinux==0.2.1",
+  "twine==3.8.0",
+  "cookiecutter==1.7.3",
+  "mdformat==0.7.13",
+  "mdformat-tables==0.4.1",
+  "cryptography>=3.4.8",
+  "PyYAML==6.0",
+]
+
+[project.scripts]
+untropy = "untropy.cli:cli"
+
+[project.optional-dependencies]
+
+test = [
+  "asynctest",
+  "pytest",
+  "pytest-cache",
+  "pytest-cov",
+  "pytest-asyncio",
+  "pytest-mock",
+  "coverage",
+  "flake8",
+  "mypy",
+  "mypy-extensions",
+  "requests",
+  "isort",
+  "black",
+  "poethepoet",
+  "types-toml",
+  "types-pytz",
+  "types-requests",
+  "types-setuptools",
+  "types-PyYAML",
+]
+
+[tool.flit.external-data]
+directory = "data"
+
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+src_paths = ["src", "test"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "--cov src --cov-report term-missing:skip-covered"
+testpaths = "tests"
+asyncio_mode = "auto"
+log_cli = false
+log_cli_level = "INFO"
+junit_family = "xunit2"
+filterwarnings = [
+  "default",
+  "ignore::DeprecationWarning:_yaml",
+  "ignore::DeprecationWarning:packaging.version",
+]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+python_version = "3.10"
+no_implicit_optional = true
+ignore_missing_imports = true
+
+strict_optional = true
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[tool.poe.executor]
+type = "virtualenv"
+location = "env"
+
+[tool.poe.tasks]
+init = { cmd = "pip install -r test-requirements.txt", help = "Install the required packages" }
+format-source = { cmd = "black src tests", help = "Format source code" }
+format-imports = { cmd = "isort src tests", help = "sort imports" }
+format = { sequence = [
+  "format-source",
+  "format-imports",
+], help = "All formatting at once" }
+
+check-style = { cmd = "black src tests --check --diff", help = "Check code style" }
+check-imports = { cmd = "isort -c src tests", help = "Check the imports" }
+check-syntax = { cmd = "flake8 src tests", help = "run flake" }
+check-grammar = { cmd = "mypy src tests", help = "Check grammar with mypy" }
+
+[tool.poe.tasks.test]
+cmd = "pytest --cov=./src --cov-report term --cov-report html --junit-xml=junit-report.xml"
+help = "Run tests with coverage"
+
+[tool.poe.tasks.check]
+sequence = [
+  "check-style",
+  "check-imports",
+  "check-syntax",
+  "check-grammar",
+  "test",
+]
+help = "Make all checks and test at once"
+
+[tool.poe.tasks.wheel]
+cmd = "pip wheel --use-feature=in-tree-build -w wheels --no-deps ."
+help = "Build wheel in ./wheels"
+
+[tool.poe.tasks.upload]
+cmd = "python -m twine upload -r unowhy wheels/untropy-*-py3-none-any.whl"
+help = "Upload built wheel to Gitlab"
+
+[tool.poe.tasks.publish]
+sequence = ["wheel", "upload"]
+help = "Build and upload to Gitlab"
+
+[tool.poe.tasks.clean]
+cmd = """
+rm -rf .coverage
+       .mypy_cache
+       .pytest_cache
+       dist
+       wheels
+       ./**/__pycache__
+"""
+help = "Clean the environment"
